@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette: ivory, cream, muted gold, deep emerald */
+  --color-ivory: #fbf7ef;
+  --color-ivory-dim: #f3ecdd;
+  --color-cream: #efe4cc;
+  --color-sand: #e4d3ad;
+  --color-gold: #b98d3e;
+  --color-gold-light: #d9b876;
+  --color-gold-deep: #8a6a2c;
+  --color-emerald: #12463b;
+  --color-emerald-deep: #0a2e27;
+  --color-emerald-light: #1f6353;
+  --color-ink: #21201b;
+
+  --font-display: "Marcellus", "Cormorant Garamond", serif;
+  --font-script: "Cormorant Garamond", serif;
+  --font-body: "Jost", "Segoe UI", sans-serif;
+
+  --animate-fade-up: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-drift: drift 22s ease-in-out infinite;
+  --animate-shimmer: shimmer 3.2s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate(2%, -3%) rotate(2deg);
+    }
+  }
+  @keyframes shimmer {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-gold-light);
+    color: var(--color-emerald-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-script {
+    font-family: var(--font-script);
+    font-style: italic;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
