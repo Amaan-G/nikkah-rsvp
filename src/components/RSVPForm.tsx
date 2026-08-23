@@ -245,7 +245,7 @@ export function RSVPForm({ guest, isEdit, onSubmitted, onBack }: RSVPFormProps) 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            placeholder="Dietary needs, well-wishes, or anything else you'd like us to know"
+            placeholder="Well-wishes or anything else you'd like us to know"
             className="w-full resize-none rounded-xl border border-emerald-deep/15 bg-white/80 px-4 py-2.5 text-sm text-emerald-deep outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30"
           />
         </div>

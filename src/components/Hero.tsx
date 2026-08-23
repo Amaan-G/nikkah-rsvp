@@ -69,6 +69,15 @@ export function Hero() {
           {eventConfig.hero.eyebrow}
         </motion.p>
 
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-4 font-script text-2xl tracking-wide text-gold-light sm:text-3xl"
+        >
+          {eventConfig.hero.inviteLine}
+        </motion.p>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -76,7 +85,9 @@ export function Hero() {
           className="mt-6 text-balance font-display text-5xl leading-[1.15] text-ivory sm:text-6xl md:text-7xl"
         >
           {eventConfig.couple.groomFirstName}
-          <span className="mx-3 text-gold-light sm:mx-5">&amp;</span>
+          <span className="mx-3 align-middle text-3xl text-gold-light sm:mx-4 sm:text-4xl md:text-5xl">
+            &amp;
+          </span>
           {eventConfig.couple.brideFirstName}
         </motion.h1>
 

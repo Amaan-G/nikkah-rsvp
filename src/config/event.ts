@@ -15,7 +15,7 @@ export const eventConfig = {
 
     brideFirstName: "Ifrah",
     brideFullName: "Ifrah Fatima",
-    brideParents: "Daughter of Mohammed Qayyum and Juweria Fatima",
+    brideParents: "Daughter of Mohammed and Juweria Qayyum",
   },
 
   /** Shown throughout the site as the couple's combined names. */
@@ -25,6 +25,7 @@ export const eventConfig = {
 
   hero: {
     eyebrow: "Bismillah",
+    inviteLine: "We cordially invite you to the Nikkah of",
     subtitle:
       "Together with their families, joyfully invite you to celebrate their Nikkah",
   },
@@ -50,7 +51,7 @@ export const eventConfig = {
     venueName: "Islamic Center of Naperville, Al Noor",
     address: "3540 248th Ave, Naperville, IL 60564",
 
-    dressCode: "Modest formal attire — soft, celebratory colors welcome.",
+    dressCode: "Modest formal attire or Islamic wear.",
     additionalNotes:
       "A brief Nikkah ceremony will be followed by dinner and celebration. Separate prayer facilities are available on-site.",
 
@@ -59,9 +60,9 @@ export const eventConfig = {
   },
 
   contact: {
-    name: "Ghoghawala & Fatima Families",
-    email: "rsvp@example.com",
-    phone: "+1 (555) 123-4567",
+    name: "Ghoghawala & Qayyum Family",
+    email: "ifrahf5616@gmail.com",
+    phone: "+1 (630) 720-1926",
   },
 
   /** Google Maps directions link — swap for a custom link if you prefer. */
