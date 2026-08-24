@@ -71,6 +71,17 @@ insert into guests (primary_guest_name, allowed_guest_count) values
   ('John Smith', 4);
 ```
 
+## Keeping Supabase awake
+
+Supabase's free tier auto-pauses a project after 7 days with no API
+activity. `.github/workflows/keep-supabase-active.yml` pings it every 3
+days via GitHub Actions so this never happens between guest visits. It
+needs two repo secrets (**GitHub repo → Settings → Secrets and variables →
+Actions → New repository secret**):
+
+- `SUPABASE_URL` — same value as `VITE_SUPABASE_URL`
+- `SUPABASE_ANON_KEY` — same value as `VITE_SUPABASE_ANON_KEY`
+
 ## Viewing responses
 
 Go to `/admin` on your deployed site (e.g. `your-site.vercel.app/admin`) and

@@ -1,0 +1,25 @@
+name: Keep Supabase project active
+
+# Supabase pauses free-tier projects after 7 days with no API activity.
+# This pings the project every 3 days so it never goes to sleep between
+# guest visits. Requires two repo secrets — see README.md.
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call search_guests RPC
+        run: |
+          curl -sS -f -X POST "${SUPABASE_URL}/rest/v1/rpc/search_guests" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"query": "keepalive"}'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
