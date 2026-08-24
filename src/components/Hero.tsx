@@ -82,24 +82,26 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 text-balance font-display text-5xl leading-[1.15] text-ivory sm:text-6xl md:text-7xl"
+          className="mt-6 flex flex-col items-center text-balance font-display text-ivory"
         >
-          {eventConfig.couple.groomFirstName}
-          <span className="mx-3 align-middle text-3xl text-gold-light sm:mx-4 sm:text-4xl md:text-5xl">
+          <span className="block text-4xl leading-tight sm:text-5xl md:text-6xl">
+            {eventConfig.couple.groomFullName}
+          </span>
+          <span className="mt-2 block font-body text-sm font-normal tracking-wide text-ivory/70 sm:text-base">
+            {eventConfig.couple.groomParents}
+          </span>
+
+          <span className="my-5 block text-2xl text-gold-light sm:text-3xl">
             &amp;
           </span>
-          {eventConfig.couple.brideFirstName}
-        </motion.h1>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="mt-5 flex flex-col gap-1 text-sm tracking-wide text-ivory/70 sm:text-base"
-        >
-          <p>{eventConfig.couple.groomParents}</p>
-          <p>{eventConfig.couple.brideParents}</p>
-        </motion.div>
+          <span className="block text-4xl leading-tight sm:text-5xl md:text-6xl">
+            {eventConfig.couple.brideFullName}
+          </span>
+          <span className="mt-2 block font-body text-sm font-normal tracking-wide text-ivory/70 sm:text-base">
+            {eventConfig.couple.brideParents}
+          </span>
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}
