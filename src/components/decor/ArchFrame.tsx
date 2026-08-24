@@ -2,6 +2,7 @@ interface ArchFrameProps {
   className?: string;
   stroke?: string;
   strokeWidth?: number;
+  preserveAspectRatio?: string;
 }
 
 /**
@@ -12,12 +13,14 @@ export function ArchFrame({
   className = "",
   stroke = "currentColor",
   strokeWidth = 1.5,
+  preserveAspectRatio = "xMidYMid meet",
 }: ArchFrameProps) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 400 560"
       fill="none"
+      preserveAspectRatio={preserveAspectRatio}
       className={className}
     >
       <path
