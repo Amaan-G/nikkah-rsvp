@@ -42,21 +42,21 @@ export const eventConfig = {
   event: {
     // Update the ISO datetime below — it drives both the displayed date/time
     // and the "Add to Calendar" links, so keep it in sync with the labels.
-    dateISO: "2026-11-06T16:00:00-06:00",
+    dateISO: "2026-11-06T14:15:00-06:00",
     dateLabel: "November 6th, 2026",
     dayOfWeek: "Friday",
-    timeLabel: "4:00 PM CST",
+    timeLabel: "2:15 PM CST",
     durationHours: 3,
 
     venueName: "Islamic Center of Naperville, Al Noor",
     address: "3540 248th Ave, Naperville, IL 60564",
 
-    dressCode: "Modest formal attire or Islamic wear.",
+    dressCode: "Modest cultural attire or Islamic wear.",
     additionalNotes:
-      "A brief Nikkah ceremony will be followed by dinner and celebration. Separate prayer facilities are available on-site.",
+      "As the ceremony falls on Jummah, we encourage guests to pray Jummah at ICN Al Noor beforehand so we can begin right on time. A brief Nikkah ceremony will be followed by dinner and celebration.",
 
-    rsvpDeadlineISO: "2026-10-09T23:59:59-05:00",
-    rsvpDeadlineLabel: "October 9th, 2026",
+    rsvpDeadlineISO: "2026-10-06T23:59:59-05:00",
+    rsvpDeadlineLabel: "October 6th, 2026",
   },
 
   contact: {
