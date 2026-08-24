@@ -5,17 +5,23 @@ name, see exactly how many seats their invitation covers, and RSVP for
 themselves and their party — all wrapped in an elegant, animated Islamic
 wedding aesthetic (ivory, cream, muted gold, deep emerald).
 
-Built with React + TypeScript + Vite, Tailwind CSS v4, and Framer Motion.
+Built with React + TypeScript + Vite, Tailwind CSS v4, Framer Motion, and
+Supabase (guest data + RSVPs).
 
 ## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local   # then fill in your Supabase URL + anon key
 npm run dev       # start the dev server
 npm run build      # type-check + production build to dist/
 npm run preview    # preview the production build locally
 npm run lint        # oxlint
 ```
+
+The site needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to run (see
+"Supabase setup" below) — both locally in `.env.local` and in Vercel under
+Project Settings → Environment Variables.
 
 ## Customizing your event
 
@@ -28,24 +34,50 @@ Colors and fonts live in **`src/index.css`** under the `@theme` block
 (`--color-ivory`, `--color-gold`, `--color-emerald`, etc.) if you want to
 adjust the palette.
 
+## Supabase setup
+
+The guest list and RSVPs live in a Supabase Postgres database, not in the
+codebase. One-time setup:
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Open **SQL Editor → New query**, paste in the entire contents of
+   [`supabase/schema.sql`](supabase/schema.sql), and run it. This creates the
+   `guests` table, the three functions the site calls, and the security
+   policies described below. It's safe to re-run.
+3. Copy your **Project URL** and **anon/public API key** from
+   Project Settings → API, and put them in `.env.local` (locally) and in your
+   Vercel project's Environment Variables (production) — see `.env.example`.
+4. To view responses at `/admin` (see below), create yourself a login under
+   **Authentication → Users → Add user** (email + password), and turn off
+   public sign-ups under **Authentication → Sign In / Providers → Email**
+   ("Allow new users to sign up") so nobody else can create an account.
+
 ## Managing the guest list
 
-Guests are defined in **`src/data/guests.ts`** as a plain array — one entry
-per invitation (a party, not a person):
+Add, edit, or remove guests directly in Supabase: **Table Editor → guests**.
+Each row is one invitation (a party, not a person):
 
-```ts
-{
-  id: "guest-009",
-  primaryGuestName: "Jane Doe",
-  allowedGuestCount: 2,
-  guestNames: [],
-  rsvpStatus: "pending",
-}
+| column                | meaning                                              |
+| ---------------------- | ----------------------------------------------------- |
+| `primary_guest_name`   | full name, exactly as the guest will type it to search |
+| `allowed_guest_count`  | the hard seat cap for that invitation                 |
+| `guest_names`, `rsvp_status`, `attending_count`, `notes`, `responded_at` | leave blank — the site fills these in once the guest RSVPs |
+
+You can also insert many at once with SQL in the SQL Editor, e.g.:
+
+```sql
+insert into guests (primary_guest_name, allowed_guest_count) values
+  ('Jane Doe', 2),
+  ('John Smith', 4);
 ```
 
-Add, remove, or edit entries directly. `id` should be unique and stable;
-`allowedGuestCount` is the hard cap on how many seats that invitation covers
-— the RSVP form will not let a guest select more than that.
+## Viewing responses
+
+Go to `/admin` on your deployed site (e.g. `your-site.vercel.app/admin`) and
+sign in with the account you created above. You'll see every RSVP — status,
+party size, guest names, notes — plus quick totals for seats invited vs.
+confirmed attending. It's read-only and only reachable by an account you
+create yourself (see Supabase setup, step 4); there's no public sign-up.
 
 ## How the RSVP flow works
 
@@ -73,35 +105,21 @@ All state transitions are orchestrated in `RSVPSection.tsx`.
 - A guest's full invitation is only ever fetched by `id` **after** they've
   been unambiguously identified (a single match, or an explicit pick from
   the disambiguation list) — never from a URL parameter or guessable input.
-- The current implementation is a local mock (see below) and, like any
-  client-only app, ships the guest list in the JS bundle. This is fine for
-  development; the "moving to a real backend" section below explains how to
-  close that gap for production.
-
-## Replacing the mock data with a real backend
+- Enforced in Postgres, not just in the frontend: the public (anon) API key
+  has no direct read/write grant on the `guests` table at all (see the
+  `revoke all` in `supabase/schema.sql`) — every request goes through a
+  `security definer` function that only ever returns the minimal fields a
+  guest needs. A name search returns no notes/guest names; a full invitation
+  is only fetched by its (unguessable, random) id after an unambiguous match.
+- The admin view at `/admin` is separate: it reads the table directly, but
+  only for a signed-in user you created yourself (see Supabase setup above).
 
 Every piece of UI talks only to the three functions exported from
 `src/services/guestService.ts` (`searchGuestsByName`, `getGuestById`,
-`submitRsvp`). Swap their implementation and nothing else needs to change.
-
-**Supabase**
-1. Create a `guests` table matching the `Guest` type in `src/types/guest.ts`.
-2. Add `search_guests(query text)` and `submit_rsvp(...)` Postgres functions
-   (RPCs) that do the matching/writes server-side.
-3. Enable Row Level Security; only expose the RPCs to the anon key, not the
-   raw table — this is what actually prevents guests from ever pulling the
-   full guest list.
-4. Replace the bodies of the three service functions with `supabase.rpc(...)`
-   calls, keeping their signatures the same.
-
-**Firebase**
-1. Store guests as documents in a `guests` Firestore collection.
-2. Do the name-matching inside a callable Cloud Function rather than
-   querying the collection from the browser, for the same reason as above.
-3. Call that function from `searchGuestsByName` / `submitRsvp`.
-
-The full reasoning is also documented inline at the top of
-`guestService.ts`.
+`submitRsvp`) — see that file's header comment and `supabase/schema.sql` for
+the full implementation. Wanting to move off Supabase later (e.g. to
+Firebase) means replacing the bodies of those three functions and nothing
+else in the UI.
 
 ## Project structure
 
@@ -112,12 +130,15 @@ src/
                       Closing, Footer)
   components/decor/   Decorative/shared pieces (arches, patterns, icons,
                       scroll-reveal wrapper)
+  pages/AdminPage.tsx  /admin — sign in, view all RSVPs
   config/event.ts     All event content — the file you edit most
-  data/guests.ts       Mock guest list
   services/
-    guestService.ts    Data access layer — swap this for a real backend
+    guestService.ts    Data access layer (Supabase-backed)
+  lib/
+    supabaseClient.ts  Supabase client (reads the VITE_SUPABASE_* env vars)
+    calendar.ts        Google Calendar / .ics helpers
   types/guest.ts       Shared TypeScript types
-  lib/calendar.ts       Google Calendar / .ics helpers
+supabase/schema.sql    Database schema, functions, and RLS policies
 ```
 
 ## Accessibility & motion
