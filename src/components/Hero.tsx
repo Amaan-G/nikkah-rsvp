@@ -22,7 +22,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-emerald-deep via-emerald to-emerald-deep text-ivory"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-emerald-deep via-emerald to-emerald-deep py-28 text-ivory sm:py-24"
     >
       <GeometricPattern
         color="#d9b876"
@@ -44,9 +44,13 @@ export function Hero() {
             ? { opacity: 0.45 }
             : { scale: archScale, opacity: archOpacity }
         }
-        className="pointer-events-none absolute bottom-0 left-1/2 h-[85%] w-[min(90vw,560px)] -translate-x-1/2 text-gold-light"
+        className="pointer-events-none absolute inset-y-0 left-1/2 w-[min(85vw,520px)] -translate-x-1/2 text-gold-light"
       >
-        <ArchFrame className="h-full w-full" strokeWidth={1.25} />
+        <ArchFrame
+          className="h-full w-full"
+          strokeWidth={1.25}
+          preserveAspectRatio="xMidYMax meet"
+        />
       </motion.div>
 
       <motion.div
