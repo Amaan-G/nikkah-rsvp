@@ -45,7 +45,8 @@ export function GuestDisambiguation({
                   {candidate.primaryGuestName}
                 </span>
                 <span className="block text-xs text-emerald-deep/55">
-                  Party of {candidate.allowedGuestCount}
+                  Invited to {candidate.invitationCount}{" "}
+                  {candidate.invitationCount === 1 ? "event" : "events"}
                 </span>
               </span>
             </button>

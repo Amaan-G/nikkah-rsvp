@@ -1,8 +1,11 @@
 import { supabase } from "../lib/supabaseClient";
 import type {
+  EventSlug,
   Guest,
   GuestLookupOutcome,
   GuestSearchResult,
+  GuestSide,
+  Invitation,
   RsvpStatus,
   RsvpSubmission,
 } from "../types/guest";
@@ -11,22 +14,27 @@ import type {
  * ============================================================================
  *  GUEST SERVICE — the only module the UI talks to for guest/RSVP data.
  * ============================================================================
- * Backed by Supabase. The three exported functions (searchGuestsByName,
- * getGuestById, submitRsvp) are the entire contract the UI depends on — see
- * supabase/schema.sql for the tables/RPC functions/RLS policies this talks
- * to, and README.md for setup instructions.
+ * Backed by Supabase. See supabase/schema.sql for the tables/RPC
+ * functions/RLS policies this talks to, and README.md for setup.
  *
  * Privacy is enforced in Postgres, not just in this file: the anon key used
- * here has no direct SELECT/UPDATE grant on the `guests` table (see the
- * `revoke all` in schema.sql) — every read/write goes through a
+ * here has no direct SELECT/UPDATE grant on `guests` or `invitations` (see
+ * the `revoke all` in schema.sql) — every read/write goes through a
  * SECURITY DEFINER RPC function that only ever returns the minimal fields a
- * guest needs (a name search returns no notes/guest_names; a full record is
- * only fetched by an unguessable uuid after an unambiguous match).
+ * guest needs. A name search returns no invitation details; a guest's full
+ * invitations are only fetched by an unguessable uuid after an unambiguous
+ * match.
  */
 
-interface GuestRow {
+interface SearchRow {
   id: string;
   primary_guest_name: string;
+  invitation_count: number;
+}
+
+interface InvitationJson {
+  id: string;
+  event_slug: EventSlug;
   allowed_guest_count: number;
   guest_names: string[] | null;
   rsvp_status: RsvpStatus;
@@ -35,17 +43,17 @@ interface GuestRow {
   responded_at: string | null;
 }
 
-interface SearchRow {
+interface GuestWithInvitationsJson {
   id: string;
   primary_guest_name: string;
-  allowed_guest_count: number;
-  rsvp_status: RsvpStatus;
+  side: GuestSide | null;
+  invitations: InvitationJson[];
 }
 
-function mapGuestRow(row: GuestRow): Guest {
+function mapInvitation(row: InvitationJson): Invitation {
   return {
     id: row.id,
-    primaryGuestName: row.primary_guest_name,
+    eventSlug: row.event_slug,
     allowedGuestCount: row.allowed_guest_count,
     guestNames: row.guest_names ?? [],
     rsvpStatus: row.rsvp_status,
@@ -55,12 +63,25 @@ function mapGuestRow(row: GuestRow): Guest {
   };
 }
 
+function mapGuest(json: GuestWithInvitationsJson): {
+  guest: Guest;
+  invitations: Invitation[];
+} {
+  return {
+    guest: {
+      id: json.id,
+      primaryGuestName: json.primary_guest_name,
+      side: json.side,
+    },
+    invitations: json.invitations.map(mapInvitation),
+  };
+}
+
 function mapSearchRow(row: SearchRow): GuestSearchResult {
   return {
     id: row.id,
     primaryGuestName: row.primary_guest_name,
-    allowedGuestCount: row.allowed_guest_count,
-    rsvpStatus: row.rsvp_status,
+    invitationCount: row.invitation_count,
   };
 }
 
@@ -84,33 +105,54 @@ export async function searchGuestsByName(
   if (rows.length === 0) return { kind: "none" };
 
   if (rows.length === 1) {
-    const guest = await getGuestById(rows[0].id);
-    if (!guest) return { kind: "none" };
-    return { kind: "single", guest };
+    const result = await getGuestWithInvitations(rows[0].id);
+    if (!result) return { kind: "none" };
+    return { kind: "single", guest: result.guest, invitations: result.invitations };
   }
 
   return { kind: "multiple", candidates: rows.map(mapSearchRow) };
 }
 
-export async function getGuestById(id: string): Promise<Guest | null> {
-  const { data, error } = await supabase.rpc("get_guest_by_id", {
-    guest_id: id,
+export async function getGuestWithInvitations(
+  guestId: string,
+): Promise<{ guest: Guest; invitations: Invitation[] } | null> {
+  const { data, error } = await supabase.rpc("get_guest_with_invitations", {
+    p_guest_id: guestId,
   });
 
-  if (error || !data || data.length === 0) return null;
-  return mapGuestRow(data[0] as GuestRow);
+  if (error || !data) return null;
+  return mapGuest(data as GuestWithInvitationsJson);
 }
 
-export async function submitRsvp(submission: RsvpSubmission): Promise<Guest> {
+export async function setGuestSide(
+  guestId: string,
+  side: GuestSide,
+): Promise<Guest> {
+  const { data, error } = await supabase.rpc("set_guest_side", {
+    p_guest_id: guestId,
+    p_side: side,
+  });
+
+  if (error || !data || data.length === 0) {
+    throw new Error("Couldn't save that — please try again.");
+  }
+
+  const row = data[0] as { id: string; primary_guest_name: string; side: GuestSide | null };
+  return { id: row.id, primaryGuestName: row.primary_guest_name, side: row.side };
+}
+
+export async function submitRsvp(submission: RsvpSubmission): Promise<Invitation> {
   if (submission.attending) {
-    const count = submission.attendeeNames.length;
-    if (count < 1 || submission.attendeeNames.some((n) => !n.trim())) {
+    if (
+      submission.attendeeNames.length < 1 ||
+      submission.attendeeNames.some((n) => !n.trim())
+    ) {
       throw new RsvpValidationError("Every guest needs a name.");
     }
   }
 
   const { data, error } = await supabase.rpc("submit_rsvp", {
-    p_guest_id: submission.guestId,
+    p_invitation_id: submission.invitationId,
     p_attending: submission.attending,
     p_attendee_names: submission.attending ? submission.attendeeNames : [],
     p_notes: submission.notes ?? "",
@@ -126,5 +168,5 @@ export async function submitRsvp(submission: RsvpSubmission): Promise<Guest> {
     throw new RsvpValidationError("We couldn't submit your RSVP. Please try again.");
   }
 
-  return mapGuestRow(data[0] as GuestRow);
+  return mapInvitation(data[0] as InvitationJson);
 }

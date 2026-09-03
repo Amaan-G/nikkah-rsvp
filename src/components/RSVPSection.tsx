@@ -1,24 +1,22 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { getGuestById } from "../services/guestService";
-import type { Guest, GuestLookupOutcome, GuestSearchResult } from "../types/guest";
+import { getGuestWithInvitations } from "../services/guestService";
+import type { Guest, GuestLookupOutcome, GuestSearchResult, Invitation } from "../types/guest";
 import { ArchDivider } from "./decor/ArchDivider";
 import { GeometricPattern } from "./decor/GeometricPattern";
 import { Ornament } from "./decor/Ornament";
 import { Reveal } from "./decor/Reveal";
 import { GuestDisambiguation } from "./GuestDisambiguation";
+import { GuestInvitations } from "./GuestInvitations";
 import { GuestLookup } from "./GuestLookup";
-import { RSVPConfirmation } from "./RSVPConfirmation";
-import { RSVPForm } from "./RSVPForm";
 import { AlertIcon } from "./decor/icons";
 
 type FlowState =
   | { step: "search" }
   | { step: "multiple"; candidates: GuestSearchResult[] }
-  | { step: "not-found"; query: string }
+  | { step: "not-found" }
   | { step: "loading" }
-  | { step: "form"; guest: Guest; isEdit: boolean }
-  | { step: "summary"; guest: Guest; justSubmitted: boolean };
+  | { step: "guest"; guest: Guest; invitations: Invitation[] };
 
 export function RSVPSection() {
   const [flow, setFlow] = useState<FlowState>({ step: "search" });
@@ -29,29 +27,21 @@ export function RSVPSection() {
 
   async function openGuest(id: string) {
     setFlow({ step: "loading" });
-    const guest = await getGuestById(id);
-    if (!guest) {
-      setFlow({ step: "not-found", query: "" });
+    const result = await getGuestWithInvitations(id);
+    if (!result) {
+      setFlow({ step: "not-found" });
       return;
     }
-    if (guest.rsvpStatus === "pending") {
-      setFlow({ step: "form", guest, isEdit: false });
-    } else {
-      setFlow({ step: "summary", guest, justSubmitted: false });
-    }
+    setFlow({ step: "guest", guest: result.guest, invitations: result.invitations });
   }
 
-  function handleLookupResult(outcome: GuestLookupOutcome, query: string) {
+  function handleLookupResult(outcome: GuestLookupOutcome) {
     if (outcome.kind === "none") {
-      setFlow({ step: "not-found", query });
+      setFlow({ step: "not-found" });
     } else if (outcome.kind === "multiple") {
       setFlow({ step: "multiple", candidates: outcome.candidates });
     } else {
-      if (outcome.guest.rsvpStatus === "pending") {
-        setFlow({ step: "form", guest: outcome.guest, isEdit: false });
-      } else {
-        setFlow({ step: "summary", guest: outcome.guest, justSubmitted: false });
-      }
+      setFlow({ step: "guest", guest: outcome.guest, invitations: outcome.invitations });
     }
   }
 
@@ -129,27 +119,12 @@ export function RSVPSection() {
                 </motion.div>
               )}
 
-              {flow.step === "form" && (
-                <RSVPForm
-                  key="form"
+              {flow.step === "guest" && (
+                <GuestInvitations
+                  key="guest"
                   guest={flow.guest}
-                  isEdit={flow.isEdit}
+                  invitations={flow.invitations}
                   onBack={reset}
-                  onSubmitted={(guest) =>
-                    setFlow({ step: "summary", guest, justSubmitted: true })
-                  }
-                />
-              )}
-
-              {flow.step === "summary" && (
-                <RSVPConfirmation
-                  key="summary"
-                  guest={flow.guest}
-                  justSubmitted={flow.justSubmitted}
-                  onEdit={() =>
-                    setFlow({ step: "form", guest: flow.guest, isEdit: true })
-                  }
-                  onSearchAgain={reset}
                 />
               )}
             </AnimatePresence>
