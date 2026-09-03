@@ -84,6 +84,15 @@ alter table invitations enable row level security;
 -- granted explicitly further down).
 revoke all on guests, invitations from anon, authenticated;
 
+-- Postgres won't let `create or replace function` change an existing
+-- function's return columns — only its body. Drop the versions from the
+-- earlier single-event schema (if present) so the definitions below can be
+-- created fresh with their new (multi-event) shapes. Harmless/no-op if
+-- they don't exist yet.
+drop function if exists search_guests(text);
+drop function if exists get_guest_by_id(uuid);
+drop function if exists submit_rsvp(uuid, boolean, text[], text);
+
 -- ----------------------------------------------------------------------------
 -- Name matching helper
 -- ----------------------------------------------------------------------------
