@@ -1,29 +1,49 @@
 import type { Session } from "@supabase/supabase-js";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { eventConfig, getEventBySlug } from "../config/event";
 import { supabase } from "../lib/supabaseClient";
-import type { Guest, RsvpStatus } from "../types/guest";
+import type { EventSlug, GuestSide, RsvpStatus } from "../types/guest";
 
-interface GuestRow {
+interface InvitationRow {
   id: string;
-  primary_guest_name: string;
+  guest_id: string;
+  event_slug: EventSlug;
   allowed_guest_count: number;
   guest_names: string[] | null;
   rsvp_status: RsvpStatus;
   attending_count: number | null;
   notes: string | null;
   responded_at: string | null;
+  guests: { primary_guest_name: string; side: GuestSide | null } | null;
 }
 
-function mapRow(row: GuestRow): Guest {
+interface AdminRow {
+  invitationId: string;
+  guestId: string;
+  guestName: string;
+  side: GuestSide | null;
+  eventSlug: EventSlug;
+  allowedGuestCount: number;
+  rsvpStatus: RsvpStatus;
+  attendingCount: number;
+  guestNames: string[];
+  notes: string | null;
+  respondedAt: string | null;
+}
+
+function mapRow(row: InvitationRow): AdminRow {
   return {
-    id: row.id,
-    primaryGuestName: row.primary_guest_name,
+    invitationId: row.id,
+    guestId: row.guest_id,
+    guestName: row.guests?.primary_guest_name ?? "Unknown",
+    side: row.guests?.side ?? null,
+    eventSlug: row.event_slug,
     allowedGuestCount: row.allowed_guest_count,
-    guestNames: row.guest_names ?? [],
     rsvpStatus: row.rsvp_status,
-    attendingCount: row.attending_count ?? undefined,
-    notes: row.notes ?? undefined,
-    respondedAt: row.responded_at ?? undefined,
+    attendingCount: row.attending_count ?? 0,
+    guestNames: row.guest_names ?? [],
+    notes: row.notes,
+    respondedAt: row.responded_at,
   };
 }
 
@@ -97,36 +117,90 @@ const STATUS_STYLES: Record<RsvpStatus, string> = {
   declined: "bg-gold/15 text-gold-deep",
 };
 
+const SIDE_LABELS: Record<string, string> = {
+  groom: "Ladke Wale (Groom's Side)",
+  bride: "Ladki Wale (Bride's Side)",
+  unset: "Not Set",
+};
+
+function StatTile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl border border-gold/25 bg-white/70 p-4 text-center">
+      <p className="text-2xl font-semibold text-emerald-deep">{value}</p>
+      <p className="text-xs uppercase tracking-wide text-emerald-deep/50">{label}</p>
+    </div>
+  );
+}
+
 function AdminDashboard() {
-  const [guests, setGuests] = useState<Guest[] | null>(null);
+  const [rows, setRows] = useState<AdminRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState<EventSlug | "all">("all");
 
   async function load() {
     setError(null);
     const { data, error } = await supabase
-      .from("guests")
-      .select("*")
-      .order("primary_guest_name");
+      .from("invitations")
+      .select("*, guests(primary_guest_name, side)")
+      .order("event_slug");
 
     if (error) {
       setError(error.message);
       return;
     }
-    setGuests((data as GuestRow[]).map(mapRow));
+    setRows((data as InvitationRow[]).map(mapRow));
   }
 
   useEffect(() => {
     load();
   }, []);
 
-  const totalInvited = guests?.reduce((sum, g) => sum + g.allowedGuestCount, 0) ?? 0;
-  const totalAttending = guests?.reduce((sum, g) => sum + (g.attendingCount ?? 0), 0) ?? 0;
-  const pending = guests?.filter((g) => g.rsvpStatus === "pending").length ?? 0;
-  const declined = guests?.filter((g) => g.rsvpStatus === "declined").length ?? 0;
+  const byEvent = useMemo(() => {
+    if (!rows) return [];
+    return eventConfig.events.map((event) => {
+      const eventRows = rows.filter((r) => r.eventSlug === event.slug);
+      return {
+        event,
+        seatsInvited: eventRows.reduce((sum, r) => sum + r.allowedGuestCount, 0),
+        attending: eventRows.reduce(
+          (sum, r) => sum + (r.rsvpStatus === "attending" ? r.attendingCount : 0),
+          0,
+        ),
+        pending: eventRows.filter((r) => r.rsvpStatus === "pending").length,
+        declined: eventRows.filter((r) => r.rsvpStatus === "declined").length,
+      };
+    });
+  }, [rows]);
+
+  const bySide = useMemo(() => {
+    if (!rows) return [];
+    const buckets: Record<string, AdminRow[]> = { groom: [], bride: [], unset: [] };
+    for (const row of rows) {
+      buckets[row.side ?? "unset"].push(row);
+    }
+    return (["groom", "bride", "unset"] as const).map((key) => {
+      const bucketRows = buckets[key];
+      const guestIds = new Set(bucketRows.map((r) => r.guestId));
+      return {
+        key,
+        guests: guestIds.size,
+        attending: bucketRows.reduce(
+          (sum, r) => sum + (r.rsvpStatus === "attending" ? r.attendingCount : 0),
+          0,
+        ),
+      };
+    });
+  }, [rows]);
+
+  const filteredRows = useMemo(() => {
+    if (!rows) return [];
+    const sorted = [...rows].sort((a, b) => a.guestName.localeCompare(b.guestName));
+    return eventFilter === "all" ? sorted : sorted.filter((r) => r.eventSlug === eventFilter);
+  }, [rows, eventFilter]);
 
   return (
     <div className="min-h-screen bg-ivory px-4 py-10 sm:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="font-display text-3xl text-emerald-deep">RSVP Responses</h1>
           <div className="flex gap-2">
@@ -147,32 +221,65 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-gold/25 bg-white/70 p-4 text-center">
-            <p className="text-2xl font-semibold text-emerald-deep">{totalInvited}</p>
-            <p className="text-xs uppercase tracking-wide text-emerald-deep/50">Seats Invited</p>
-          </div>
-          <div className="rounded-xl border border-gold/25 bg-white/70 p-4 text-center">
-            <p className="text-2xl font-semibold text-emerald-deep">{totalAttending}</p>
-            <p className="text-xs uppercase tracking-wide text-emerald-deep/50">Confirmed Attending</p>
-          </div>
-          <div className="rounded-xl border border-gold/25 bg-white/70 p-4 text-center">
-            <p className="text-2xl font-semibold text-emerald-deep">{pending}</p>
-            <p className="text-xs uppercase tracking-wide text-emerald-deep/50">Awaiting Response</p>
-          </div>
-          <div className="rounded-xl border border-gold/25 bg-white/70 p-4 text-center">
-            <p className="text-2xl font-semibold text-emerald-deep">{declined}</p>
-            <p className="text-xs uppercase tracking-wide text-emerald-deep/50">Declined</p>
-          </div>
-        </div>
-
         {error && <p className="mt-6 text-sm text-red-700">{error}</p>}
 
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-gold/25 bg-white/70">
-          <table className="w-full min-w-[720px] text-left text-sm">
+        <h2 className="mt-8 text-xs font-semibold uppercase tracking-wide text-emerald-deep/50">
+          By Event
+        </h2>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {byEvent.map(({ event, seatsInvited, attending, pending, declined }) => (
+            <div key={event.slug} className="rounded-2xl border border-gold/25 bg-white/50 p-4">
+              <p className="font-display text-lg text-emerald-deep">{event.name}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <StatTile label="Seats Invited" value={seatsInvited} />
+                <StatTile label="Attending" value={attending} />
+                <StatTile label="Pending" value={pending} />
+                <StatTile label="Declined" value={declined} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="mt-8 text-xs font-semibold uppercase tracking-wide text-emerald-deep/50">
+          By Side
+        </h2>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {bySide.map(({ key, guests, attending }) => (
+            <div key={key} className="rounded-2xl border border-gold/25 bg-white/50 p-4 text-center">
+              <p className="font-medium text-emerald-deep">{SIDE_LABELS[key]}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <StatTile label="Invited Guests" value={guests} />
+                <StatTile label="Attending" value={attending} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-emerald-deep/50">
+            All Responses
+          </h2>
+          <select
+            value={eventFilter}
+            onChange={(e) => setEventFilter(e.target.value as EventSlug | "all")}
+            className="rounded-lg border border-emerald-deep/15 bg-white px-3 py-1.5 text-sm text-emerald-deep outline-none focus:border-gold"
+          >
+            <option value="all">All events</option>
+            {eventConfig.events.map((event) => (
+              <option key={event.slug} value={event.slug}>
+                {event.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mt-3 overflow-x-auto rounded-2xl border border-gold/25 bg-white/70">
+          <table className="w-full min-w-[880px] text-left text-sm">
             <thead>
               <tr className="border-b border-gold/20 text-xs uppercase tracking-wide text-emerald-deep/50">
                 <th className="px-4 py-3">Invitation</th>
+                <th className="px-4 py-3">Side</th>
+                <th className="px-4 py-3">Event</th>
                 <th className="px-4 py-3">Seats</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Attending</th>
@@ -182,43 +289,50 @@ function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {guests === null ? (
+              {rows === null ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-emerald-deep/50">
+                  <td colSpan={9} className="px-4 py-6 text-center text-emerald-deep/50">
                     Loading…
                   </td>
                 </tr>
-              ) : guests.length === 0 ? (
+              ) : filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-emerald-deep/50">
-                    No guests yet. Add rows in Supabase → Table Editor → guests.
+                  <td colSpan={9} className="px-4 py-6 text-center text-emerald-deep/50">
+                    No guests yet. Add rows in Supabase → Table Editor.
                   </td>
                 </tr>
               ) : (
-                guests.map((g) => (
-                  <tr key={g.id} className="border-b border-gold/10 align-top last:border-0">
-                    <td className="px-4 py-3 font-medium text-emerald-deep">
-                      {g.primaryGuestName}
+                filteredRows.map((r) => (
+                  <tr
+                    key={r.invitationId}
+                    className="border-b border-gold/10 align-top last:border-0"
+                  >
+                    <td className="px-4 py-3 font-medium text-emerald-deep">{r.guestName}</td>
+                    <td className="px-4 py-3 text-emerald-deep/70">
+                      {r.side ? SIDE_LABELS[r.side] : "—"}
                     </td>
-                    <td className="px-4 py-3 text-emerald-deep/80">{g.allowedGuestCount}</td>
+                    <td className="px-4 py-3 text-emerald-deep/80">
+                      {getEventBySlug(r.eventSlug).name}
+                    </td>
+                    <td className="px-4 py-3 text-emerald-deep/80">{r.allowedGuestCount}</td>
                     <td className="px-4 py-3">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[g.rsvpStatus]}`}
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[r.rsvpStatus]}`}
                       >
-                        {g.rsvpStatus}
+                        {r.rsvpStatus}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-emerald-deep/80">
-                      {g.rsvpStatus === "pending" ? "—" : g.attendingCount ?? 0}
+                      {r.rsvpStatus === "pending" ? "—" : r.attendingCount}
                     </td>
                     <td className="px-4 py-3 text-emerald-deep/80">
-                      {g.guestNames.length > 0 ? g.guestNames.join(", ") : "—"}
+                      {r.guestNames.length > 0 ? r.guestNames.join(", ") : "—"}
                     </td>
                     <td className="max-w-[200px] px-4 py-3 text-emerald-deep/70">
-                      {g.notes || "—"}
+                      {r.notes || "—"}
                     </td>
                     <td className="px-4 py-3 text-emerald-deep/60">
-                      {g.respondedAt ? new Date(g.respondedAt).toLocaleDateString() : "—"}
+                      {r.respondedAt ? new Date(r.respondedAt).toLocaleDateString() : "—"}
                     </td>
                   </tr>
                 ))

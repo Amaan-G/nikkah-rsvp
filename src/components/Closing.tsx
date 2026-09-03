@@ -54,7 +54,7 @@ export function Closing() {
 
         <Reveal delay={0.4}>
           <p className="mt-6 text-sm tracking-[0.25em] text-ivory/60">
-            {eventConfig.event.dayOfWeek.toUpperCase()} · {eventConfig.event.dateLabel.toUpperCase()}
+            {eventConfig.hero.dateLabel.toUpperCase()}
           </p>
         </Reveal>
       </div>

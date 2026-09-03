@@ -1,47 +1,50 @@
 /**
- * Core domain types for the guest list & RSVP flow.
- * Keep this the single source of truth for the shape of a guest record —
- * both the mock data layer and any future backend (Supabase/Firebase/etc.)
- * should conform to this shape.
+ * Core domain types for the guest list & multi-event RSVP flow.
+ * Keep this the single source of truth for these shapes — both the
+ * Supabase-backed service layer and the UI depend on it.
  */
 
 export type RsvpStatus = "pending" | "attending" | "declined";
 
+export type EventSlug = "nikkah" | "shaadi" | "valima";
+
+export type GuestSide = "groom" | "bride";
+
+/** A guest is a party/invitation-holder — one row per family/household, not per person. */
 export interface Guest {
-  /** Stable unique identifier. Never derived from name — safe to use as a DB key. */
   id: string;
-  /** Full name as it should be displayed, e.g. "Amaan Ghoghawala". */
   primaryGuestName: string;
-  /** Maximum number of people (including the primary guest) this invitation covers. */
+  /** Which side of the family invited this guest. Unset until they (or you) choose it. */
+  side: GuestSide | null;
+}
+
+/** One guest's RSVP status for a single event (Nikkah, Shaadi, or Valima). */
+export interface Invitation {
+  id: string;
+  eventSlug: EventSlug;
   allowedGuestCount: number;
-  /** Names of everyone attending, filled in once the RSVP is submitted (primary guest included). */
   guestNames: string[];
-  /** Current RSVP state. Starts "pending" until the guest responds. */
   rsvpStatus: RsvpStatus;
-  /** How many of the allowed seats are actually attending. Set on submit. */
   attendingCount?: number;
-  /** Optional freeform note from the guest (dietary needs, well-wishes, etc). */
   notes?: string;
-  /** ISO 8601 timestamp of when the RSVP was last submitted/updated. */
   respondedAt?: string;
 }
 
-/** Lightweight, non-identifying record returned by a name search — never leaks other guests' data. */
+/** Lightweight, non-identifying record returned by a name search. */
 export interface GuestSearchResult {
   id: string;
   primaryGuestName: string;
-  allowedGuestCount: number;
-  rsvpStatus: RsvpStatus;
-}
-
-export interface RsvpSubmission {
-  guestId: string;
-  attending: boolean;
-  attendeeNames: string[];
-  notes?: string;
+  invitationCount: number;
 }
 
 export type GuestLookupOutcome =
   | { kind: "none" }
-  | { kind: "single"; guest: Guest }
+  | { kind: "single"; guest: Guest; invitations: Invitation[] }
   | { kind: "multiple"; candidates: GuestSearchResult[] };
+
+export interface RsvpSubmission {
+  invitationId: string;
+  attending: boolean;
+  attendeeNames: string[];
+  notes?: string;
+}

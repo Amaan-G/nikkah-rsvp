@@ -123,7 +123,7 @@ export function Hero() {
           className="mt-10 flex items-center gap-4 font-display text-lg tracking-[0.2em] text-gold-light sm:text-xl"
         >
           <span className="h-px w-8 bg-gold-light/50" />
-          {eventConfig.event.dayOfWeek}, {eventConfig.event.dateLabel}
+          {eventConfig.hero.dateLabel}
           <span className="h-px w-8 bg-gold-light/50" />
         </motion.div>
       </motion.div>
