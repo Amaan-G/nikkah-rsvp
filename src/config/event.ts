@@ -43,7 +43,8 @@ export const eventConfig = {
 
   hero: {
     eyebrow: "Bismillah",
-    inviteLine: "Mrs. Najma Md. Shakir Ghoghawala cordially invites you to the wedding of",
+    inviterName: "Mrs. Najma Md. Shakir Ghoghawala",
+    inviteLine: "cordially invites you to the wedding of",
     subtitle:
       "Together with their families, joyfully invite you to celebrate their wedding",
     /** Compact date range shown in the hero — edit directly since it spans multiple events. */

@@ -46,9 +46,9 @@ export function RSVPSection() {
   }
 
   return (
-    <section id="rsvp" className="relative bg-ivory text-emerald-deep">
+    <section id="rsvp" className="relative bg-cream text-emerald-deep">
       <div className="absolute inset-0 -translate-y-px">
-        <ArchDivider fill="var(--color-ivory)" height={64} count={8} />
+        <ArchDivider fill="var(--color-cream)" height={64} count={8} />
       </div>
 
       <div className="relative overflow-hidden py-28 sm:py-36">
@@ -62,7 +62,7 @@ export function RSVPSection() {
             </p>
           </Reveal>
 
-          <div className="relative mt-8 rounded-t-[120px] rounded-b-[2rem] border border-gold/25 bg-gradient-to-b from-cream/60 to-white/70 px-6 py-14 shadow-[0_20px_60px_-25px_rgba(18,70,59,0.35)] backdrop-blur-sm sm:px-12 sm:py-16">
+          <div className="relative mt-8 rounded-t-[120px] rounded-b-[2rem] border border-gold/25 bg-gradient-to-b from-ivory/80 to-white/80 px-6 py-14 shadow-[0_20px_60px_-25px_rgba(18,70,59,0.35)] backdrop-blur-sm sm:px-12 sm:py-16">
             <AnimatePresence mode="wait">
               {flow.step === "search" && (
                 <GuestLookup key="lookup" onResult={handleLookupResult} />
