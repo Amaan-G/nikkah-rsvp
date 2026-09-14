@@ -43,20 +43,25 @@ export const eventConfig = {
 
   hero: {
     eyebrow: "Bismillah",
-    inviteLine: "We cordially invite you to the Nikkah of",
+    inviteLine: "Mrs. Najma Md. Shakir Ghoghawala cordially invites you to the wedding of",
     subtitle:
-      "Together with their families, joyfully invite you to celebrate their Nikkah",
+      "Together with their families, joyfully invite you to celebrate their wedding",
     /** Compact date range shown in the hero — edit directly since it spans multiple events. */
-    dateLabel: "November 6 & 15, 2026",
+    dateLabel: "November 13 & 15, 2026",
   },
 
   invitation: {
-    heading: "You Are Warmly Invited",
+    heading: "Our Families Welcome You",
     body:
-      "With hearts full of gratitude, we invite you to witness the beginning of our journey together. " +
-      "Your presence, prayers, and blessings would mean the world to us as we begin this new chapter, " +
-      "united in faith and love before Allah (SWT). Please join our families for an evening of joy, " +
-      "gratitude, and celebration.",
+      "Our loved ones join together in warmly welcoming you to share in this blessed celebration.",
+    families: {
+      groomSide: [
+        "Md. Habib and Fehmida Valiullah",
+        "Nisharahmed and Arjuman Hawa",
+        "Akil and Humaira Ghoghawala",
+      ],
+      brideSide: ["Mr. Masood Ali & Mrs. Syeda Zahera (Late)"],
+    },
   },
 
   /** One entry per event — the site will show a card for each and RSVP is per-event. */
@@ -64,10 +69,10 @@ export const eventConfig = {
     {
       slug: "nikkah",
       name: "Nikkah",
-      dateISO: "2026-11-06T14:15:00-06:00",
-      dateLabel: "November 6th, 2026",
+      dateISO: "2026-11-13T15:30:00-06:00",
+      dateLabel: "November 13th, 2026",
       dayOfWeek: "Friday",
-      timeLabel: "2:15 PM CST",
+      timeLabel: "3:30 PM CST",
       durationHours: 3,
       venueName: "Islamic Center of Naperville, Al Noor",
       address: "3540 248th Ave, Naperville, IL 60564",
@@ -77,10 +82,10 @@ export const eventConfig = {
     {
       slug: "shaadi",
       name: "Shaadi",
-      dateISO: "2026-11-06T19:00:00-06:00",
-      dateLabel: "November 6th, 2026",
+      dateISO: "2026-11-13T18:00:00-06:00",
+      dateLabel: "November 13th, 2026",
       dayOfWeek: "Friday",
-      timeLabel: "7:00 PM CST",
+      timeLabel: "6:00 PM CST",
       durationHours: 4,
       venueName: "Monty's Elegant Banquets",
       address: "703 S York Rd, Bensenville, IL 60106",
@@ -94,8 +99,8 @@ export const eventConfig = {
       dayOfWeek: "Sunday",
       timeLabel: "7:00 PM CST",
       durationHours: 4,
-      venueName: "Victoria in the Park",
-      address: "1700 S Elmhurst Rd, Mt Prospect, IL 60056",
+      venueName: "Drury Lane Theatre & Events",
+      address: "100 Drury Lane, Oakbrook Terrace, IL 60181",
     },
   ] satisfies EventDetail[],
 

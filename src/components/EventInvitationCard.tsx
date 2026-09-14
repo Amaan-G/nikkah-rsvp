@@ -1,13 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState, type FormEvent } from "react";
-import { getEventBySlug } from "../config/event";
+import { eventConfig, getEventBySlug } from "../config/event";
+import { buildGoogleCalendarUrl, downloadIcsFile } from "../lib/calendar";
 import { RsvpValidationError, submitRsvp } from "../services/guestService";
 import type { Invitation } from "../types/guest";
 import {
   AlertIcon,
   ArrowRightIcon,
+  CalendarIcon,
   CheckCircleIcon,
   EditIcon,
+  MapPinIcon,
   XCircleIcon,
 } from "./decor/icons";
 
@@ -111,8 +114,39 @@ export function EventInvitationCard({
       <div className="border-b border-gold/15 bg-gold/5 px-6 py-4">
         <p className="font-display text-xl text-emerald-deep">{event.name}</p>
         <p className="mt-0.5 text-xs text-emerald-deep/60">
-          {event.dayOfWeek}, {event.dateLabel} · {event.timeLabel} · {event.venueName}
+          {event.dayOfWeek}, {event.dateLabel} · {event.timeLabel}
         </p>
+        <p className="mt-0.5 text-xs text-emerald-deep/60">
+          {event.venueName} · {event.address}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a
+            href={eventConfig.directionsUrl(event)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-white/60 px-3 py-1 text-xs font-medium text-gold-deep transition hover:bg-gold/10"
+          >
+            <MapPinIcon className="h-3.5 w-3.5" />
+            Get Directions
+          </a>
+          <a
+            href={buildGoogleCalendarUrl(event)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-white/60 px-3 py-1 text-xs font-medium text-gold-deep transition hover:bg-gold/10"
+          >
+            <CalendarIcon className="h-3.5 w-3.5" />
+            Google Calendar
+          </a>
+          <button
+            type="button"
+            onClick={() => downloadIcsFile(event)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-white/60 px-3 py-1 text-xs font-medium text-gold-deep transition hover:bg-gold/10"
+          >
+            <CalendarIcon className="h-3.5 w-3.5" />
+            .ics File
+          </button>
+        </div>
       </div>
 
       <div className="px-6 py-6">

@@ -167,10 +167,11 @@ bodies of those four functions and nothing else in the UI.
 
 ```text
 src/
-  components/          UI components (Hero, Invitation, EventDetails,
-                        RSVPSection, GuestLookup, GuestDisambiguation,
-                        GuestSideSelector, GuestInvitations,
-                        EventInvitationCard, Closing, Footer)
+  components/          UI components (Hero, Invitation, RSVPSection,
+                        GuestLookup, GuestDisambiguation, GuestSideSelector,
+                        GuestInvitations, EventInvitationCard — event date/
+                        time/venue/directions are shown per-invitation here,
+                        not on a public page — Closing, Footer)
   components/decor/     Decorative/shared pieces (arches, patterns, icons,
                         scroll-reveal wrapper)
   pages/AdminPage.tsx    /admin — sign in, view all RSVPs by event/side
