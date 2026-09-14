@@ -1,5 +1,4 @@
 import { Closing } from "./components/Closing";
-import { EventDetails } from "./components/EventDetails";
 import { Footer } from "./components/Footer";
 import { Hero } from "./components/Hero";
 import { Invitation } from "./components/Invitation";
@@ -17,7 +16,6 @@ function App() {
       <main>
         <Hero />
         <Invitation />
-        <EventDetails />
         <RSVPSection />
         <Closing />
       </main>

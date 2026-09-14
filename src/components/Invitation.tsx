@@ -35,6 +35,35 @@ export function Invitation() {
           </Reveal>
 
           <Reveal delay={0.3}>
+            <div className="mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 sm:grid-cols-2">
+              <div>
+                <p className="font-display text-sm uppercase tracking-[0.2em] text-gold-deep">
+                  Groom&apos;s Side
+                </p>
+                <ul className="mt-3 flex flex-col gap-2">
+                  {eventConfig.invitation.families.groomSide.map((name) => (
+                    <li key={name} className="text-sm text-emerald-deep/80">
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="font-display text-sm uppercase tracking-[0.2em] text-gold-deep">
+                  Bride&apos;s Side
+                </p>
+                <ul className="mt-3 flex flex-col gap-2">
+                  {eventConfig.invitation.families.brideSide.map((name) => (
+                    <li key={name} className="text-sm text-emerald-deep/80">
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.4}>
             <p className="mt-10 font-script text-2xl text-gold-deep">
               {eventConfig.coupleNames}
             </p>
