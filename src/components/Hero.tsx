@@ -77,9 +77,14 @@ export function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-4 font-script text-2xl tracking-wide text-gold-light sm:text-3xl"
+          className="mt-4 font-script tracking-wide text-gold-light"
         >
-          {eventConfig.hero.inviteLine}
+          <span className="block text-base not-italic tracking-[0.04em] text-gold-light/85 sm:text-lg">
+            {eventConfig.hero.inviterName}
+          </span>
+          <span className="mt-1 block text-2xl sm:text-3xl">
+            {eventConfig.hero.inviteLine}
+          </span>
         </motion.p>
 
         <motion.h1
