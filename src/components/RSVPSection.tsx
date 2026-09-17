@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { eventConfig } from "../config/event";
 import { getGuestWithInvitations } from "../services/guestService";
 import type { Guest, GuestLookupOutcome, GuestSearchResult, Invitation } from "../types/guest";
 import { ArchDivider } from "./decor/ArchDivider";
@@ -59,6 +60,9 @@ export function RSVPSection() {
             <Ornament className="text-gold" />
             <p className="mt-6 text-xs uppercase tracking-[0.3em] text-gold-deep">
               RSVP
+            </p>
+            <p className="mt-3 text-sm text-emerald-deep/70">
+              Kindly RSVP by {eventConfig.rsvpDeadlineLabel}
             </p>
           </Reveal>
 

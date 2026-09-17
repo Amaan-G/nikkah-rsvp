@@ -6,6 +6,7 @@ export function Footer() {
       <p className="text-xs tracking-wide">
         With love, the {eventConfig.contact.name}
       </p>
+      <p className="mt-2 text-xs">{eventConfig.giftNote}</p>
       <p className="mt-2 text-xs">
         Questions? Reach us at{" "}
         <a

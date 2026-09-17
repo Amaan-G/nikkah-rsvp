@@ -59,8 +59,8 @@ export const eventConfig = {
     families: {
       groomSide: [
         "Mrs. Najma Md. Shakir Ghoghawala",
-        "Md. Habib and Fehmida Valiullah",
         "Nisharahmed and Arjuman Hawa",
+        "Md. Habib and Fehmida Valiullah",
         "Akil and Humaira Ghoghawala",
         "Farhaan Ghoghawala",
       ],
@@ -136,8 +136,9 @@ export const eventConfig = {
   ] satisfies EventDetail[],
 
   dressCode: "Modest cultural attire or Islamic wear.",
-  rsvpDeadlineISO: "2026-10-06T23:59:59-05:00",
-  rsvpDeadlineLabel: "October 6th, 2026",
+  rsvpDeadlineISO: "2026-10-31T23:59:59-05:00",
+  rsvpDeadlineLabel: "October 31st, 2026",
+  giftNote: "With love and gratitude, no boxed gifts please.",
 
   contact: {
     name: "Ghoghawala & Qayyum Family",
