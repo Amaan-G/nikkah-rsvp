@@ -34,12 +34,6 @@ export function ArchFrame({
         strokeWidth={strokeWidth}
         opacity={0.55}
       />
-      <path
-        d="M200 30C200 30 175 95 200 130C225 95 200 30 200 30Z"
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        opacity={0.8}
-      />
     </svg>
   );
 }

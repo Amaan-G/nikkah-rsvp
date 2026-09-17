@@ -71,10 +71,12 @@ vs. Shaadi vs. Valima, or only be invited to some of the three).
    `groom`/`bride`, if you already know it — guests can also set this
    themselves when they RSVP). Save, then copy the new row's `id`.
 2. `invitations` → Insert row, once per event that guest is invited to:
-   `guest_id` = the id you just copied, `event_slug` = `nikkah` / `shaadi` /
-   `valima`, `allowed_guest_count` = their seat cap for that event. Leave
-   `guest_names`, `rsvp_status`, `attending_count`, `notes`, `responded_at`
-   blank — the site fills those in once they RSVP.
+   `guest_id` = the id you just copied, `event_slug` = one of `dua` /
+   `mehndi` / `nikkah` / `shaadi` / `valima`, `allowed_guest_count` = their
+   seat cap for that event. Leave `guest_names`, `rsvp_status`,
+   `attending_count`, `notes`, `responded_at` blank — the site fills those
+   in once they RSVP. A guest only ever sees the events they have a row
+   for, so Dua/Mehndi stay private to whoever's actually invited.
 
 **SQL Editor** (faster for a batch — this pattern is also at the bottom of
 `supabase/schema.sql`):

@@ -112,7 +112,14 @@ export function EventInvitationCard({
   return (
     <div className="overflow-hidden rounded-2xl border border-gold/25 bg-white/70 text-left">
       <div className="border-b border-gold/15 bg-gold/5 px-6 py-4">
-        <p className="font-display text-xl text-emerald-deep">{event.name}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-display text-xl text-emerald-deep">{event.name}</p>
+          {event.ladiesOnly && (
+            <span className="rounded-full border border-gold/40 bg-white/60 px-2.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-gold-deep">
+              Ladies Only
+            </span>
+          )}
+        </div>
         <p className="mt-0.5 text-xs text-emerald-deep/60">
           {event.dayOfWeek}, {event.dateLabel} · {event.timeLabel}
         </p>
