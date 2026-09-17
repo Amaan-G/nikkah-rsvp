@@ -73,6 +73,15 @@ export function Hero() {
           {eventConfig.hero.eyebrow}
         </motion.p>
 
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-4 font-script text-2xl tracking-wide text-gold-light sm:text-3xl"
+        >
+          {eventConfig.hero.inviteLine}
+        </motion.p>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
