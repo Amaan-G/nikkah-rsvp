@@ -1,5 +1,5 @@
 -- ============================================================================
---  Nikkah RSVP — Supabase schema (multi-event: Nikkah, Shaadi, Valima)
+--  Nikkah RSVP — Supabase schema (multi-event: Dua, Mehndi, Nikkah, Shaadi, Valima)
 -- ============================================================================
 -- Run this in your Supabase project's SQL Editor (Dashboard → SQL Editor →
 -- New query → paste this whole file → Run). Safe to re-run: everything is
@@ -21,7 +21,10 @@
 --
 -- Event details (names/dates/venues/notes) are NOT stored here — they live
 -- in src/config/event.ts. This table only stores the `event_slug`
--- ("nikkah" | "shaadi" | "valima") linking an invitation to one of those.
+-- ("dua" | "mehndi" | "nikkah" | "shaadi" | "valima") linking an invitation
+-- to one of those. Only guests with an actual invitations row for an event
+-- ever see that event — Dua/Mehndi being unlisted for someone means exactly
+-- that: they simply won't have a row for it, same as any other event.
 -- ============================================================================
 
 create extension if not exists pgcrypto;
@@ -36,7 +39,7 @@ alter table guests add column if not exists side text check (side in ('groom', '
 create table if not exists invitations (
   id uuid primary key default gen_random_uuid(),
   guest_id uuid not null references guests(id) on delete cascade,
-  event_slug text not null check (event_slug in ('nikkah', 'shaadi', 'valima')),
+  event_slug text not null check (event_slug in ('dua', 'mehndi', 'nikkah', 'shaadi', 'valima')),
   allowed_guest_count int not null check (allowed_guest_count > 0),
   guest_names text[] not null default '{}',
   rsvp_status text not null default 'pending'
@@ -46,6 +49,14 @@ create table if not exists invitations (
   responded_at timestamptz,
   unique (guest_id, event_slug)
 );
+
+-- Widen event_slug to allow the newer Dua/Mehndi events. Safe on an existing
+-- table with hundreds of rows already in it: nikkah/shaadi/valima remain
+-- allowed, so every existing row still satisfies the new constraint — this
+-- only adds two more allowed values, it doesn't touch any data.
+alter table invitations drop constraint if exists invitations_event_slug_check;
+alter table invitations add constraint invitations_event_slug_check
+  check (event_slug in ('dua', 'mehndi', 'nikkah', 'shaadi', 'valima'));
 
 -- ----------------------------------------------------------------------------
 -- One-time migration from the earlier single-event schema, if present: move
@@ -144,6 +155,13 @@ begin
     return;
   end if;
 
+  -- Fuzzy (reordered-token) matching only kicks in for a first+last name
+  -- query. A single word ("Ahmed") would otherwise match every guest whose
+  -- name contains it anywhere, which gets noisy fast on a large guest list.
+  if array_length(query_tokens, 1) < 2 then
+    return;
+  end if;
+
   return query
     select g.id, g.primary_guest_name,
            (select count(*)::int from invitations i where i.guest_id = g.id)
@@ -181,6 +199,14 @@ as $$
             'notes', i.notes,
             'responded_at', i.responded_at
           )
+          order by case i.event_slug
+            when 'dua' then 1
+            when 'mehndi' then 2
+            when 'nikkah' then 3
+            when 'shaadi' then 4
+            when 'valima' then 5
+            else 6
+          end
         )
         from invitations i
         where i.guest_id = g.id
@@ -284,6 +310,9 @@ create policy "authenticated can read all invitations"
 -- Adding your guest list: Table Editor is easiest for one-off entries
 -- (Table Editor → guests → Insert row, then invitations → Insert row with
 -- the matching guest_id and event_slug), but for a batch it's faster here.
+-- event_slug is one of: 'dua', 'mehndi', 'nikkah', 'shaadi', 'valima' — only
+-- add a row for an event a guest is actually invited to; Dua/Mehndi (and
+-- whether "Ladies Only" shows) stay private to whoever has a row for them.
 -- Uncomment and edit, or run separately in the SQL Editor:
 --
 -- with new_guest as (
@@ -292,6 +321,7 @@ create policy "authenticated can read all invitations"
 -- )
 -- insert into invitations (guest_id, event_slug, allowed_guest_count)
 -- select id, slug, count from new_guest, (values
+--   ('mehndi', 1),
 --   ('nikkah', 2),
 --   ('shaadi', 2),
 --   ('valima', 4)

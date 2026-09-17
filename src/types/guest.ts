@@ -6,7 +6,7 @@
 
 export type RsvpStatus = "pending" | "attending" | "declined";
 
-export type EventSlug = "nikkah" | "shaadi" | "valima";
+export type EventSlug = "dua" | "mehndi" | "nikkah" | "shaadi" | "valima";
 
 export type GuestSide = "groom" | "bride";
 

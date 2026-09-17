@@ -23,6 +23,8 @@ export interface EventDetail {
   address: string;
   /** Optional short note shown under this event's details (e.g. a Jummah reminder). */
   notes?: string;
+  /** Shows a "Ladies Only" badge on this event's RSVP card when true. */
+  ladiesOnly?: boolean;
 }
 
 export const eventConfig = {
@@ -43,8 +45,6 @@ export const eventConfig = {
 
   hero: {
     eyebrow: "Bismillah",
-    inviterName: "Mrs. Najma Md. Shakir Ghoghawala",
-    inviteLine: "cordially invites you to the wedding of",
     subtitle:
       "Together with their families, joyfully invite you to celebrate their wedding",
     /** Compact date range shown in the hero — edit directly since it spans multiple events. */
@@ -57,6 +57,7 @@ export const eventConfig = {
       "Our loved ones join together in warmly welcoming you to share in this blessed celebration.",
     families: {
       groomSide: [
+        "Mrs. Najma Md. Shakir Ghoghawala",
         "Md. Habib and Fehmida Valiullah",
         "Nisharahmed and Arjuman Hawa",
         "Akil and Humaira Ghoghawala",
@@ -67,6 +68,29 @@ export const eventConfig = {
 
   /** One entry per event — the site will show a card for each and RSVP is per-event. */
   events: [
+    {
+      slug: "dua",
+      name: "Dua",
+      dateISO: "2026-11-11T18:00:00-06:00",
+      dateLabel: "November 11th, 2026",
+      dayOfWeek: "Wednesday",
+      timeLabel: "6:00 PM CST",
+      durationHours: 2,
+      venueName: "Islamic Foundation North",
+      address: "1751 O'Plaine Rd, Libertyville, IL 60048",
+    },
+    {
+      slug: "mehndi",
+      name: "Mehndi",
+      dateISO: "2026-11-12T17:00:00-06:00",
+      dateLabel: "November 12th, 2026",
+      dayOfWeek: "Thursday",
+      timeLabel: "5:00 PM CST",
+      durationHours: 4,
+      venueName: "Ghoghawala Residence",
+      address: "2598 Hastings Ln, Gurnee, IL 60031",
+      ladiesOnly: true,
+    },
     {
       slug: "nikkah",
       name: "Nikkah",
