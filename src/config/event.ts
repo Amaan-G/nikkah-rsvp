@@ -35,7 +35,7 @@ export const eventConfig = {
 
     brideFirstName: "Ifrah",
     brideFullName: "Ifrah Fatima",
-    brideParents: "Daughter of Mohammed and Juweria Qayyum",
+    brideParents: "Daughter of Mohammed and Juwaria Qayyum",
   },
 
   /** Shown throughout the site as the couple's combined names. */
@@ -47,7 +47,7 @@ export const eventConfig = {
     eyebrow: "Bismillah",
     inviteLine: "We cordially invite you to the wedding of",
     subtitle:
-      "Together with their families, joyfully invite you to celebrate their wedding",
+      "With hearts full of joy, we begin this blessed journey together, Insha'Allah",
     /** Compact date range shown in the hero — edit directly since it spans multiple events. */
     dateLabel: "November 13 & 15, 2026",
   },
@@ -62,8 +62,13 @@ export const eventConfig = {
         "Md. Habib and Fehmida Valiullah",
         "Nisharahmed and Arjuman Hawa",
         "Akil and Humaira Ghoghawala",
+        "Farhaan Ghoghawala",
       ],
-      brideSide: ["Mr. Masood Ali & Mrs. Syeda Zahera (Late)"],
+      brideSide: [
+        "Mr. Masood Ali & Mrs. Syeda Zahera (Late)",
+        "Mohammed Safdar Ali and Kaneez Fatima Nishat",
+        "Mohammed Abdul Imtiyaz and Kouser Fatima Siddiqa",
+      ],
     },
   },
 
@@ -120,10 +125,10 @@ export const eventConfig = {
     {
       slug: "valima",
       name: "Valima",
-      dateISO: "2026-11-15T19:00:00-06:00",
+      dateISO: "2026-11-15T18:00:00-06:00",
       dateLabel: "November 15th, 2026",
       dayOfWeek: "Sunday",
-      timeLabel: "7:00 PM CST",
+      timeLabel: "6:00 PM CST",
       durationHours: 4,
       venueName: "Drury Lane Theatre & Events",
       address: "100 Drury Lane, Oakbrook Terrace, IL 60181",
