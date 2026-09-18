@@ -1,7 +1,6 @@
 import { Closing } from "./components/Closing";
 import { Footer } from "./components/Footer";
 import { Hero } from "./components/Hero";
-import { Invitation } from "./components/Invitation";
 import { RSVPSection } from "./components/RSVPSection";
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
       </a>
       <main>
         <Hero />
-        <Invitation />
         <RSVPSection />
         <Closing />
       </main>
