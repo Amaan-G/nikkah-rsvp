@@ -52,26 +52,6 @@ export const eventConfig = {
     dateLabel: "November 13 & 15, 2026",
   },
 
-  invitation: {
-    heading: "Our Families Welcome You",
-    body:
-      "Our loved ones join together in warmly welcoming you to share in this blessed celebration.",
-    families: {
-      groomSide: [
-        "Mrs. Najma Md. Shakir Ghoghawala",
-        "Nisharahmed and Arjuman Hawa",
-        "Md. Habib and Fehmida Valiullah",
-        "Akil and Humaira Ghoghawala",
-        "Farhaan Ghoghawala",
-      ],
-      brideSide: [
-        "Mr. Masood Ali & Mrs. Syeda Zahera (Late)",
-        "Mohammed Safdar Ali and Kaneez Fatima Nishat",
-        "Mohammed Abdul Imtiyaz and Kouser Fatima Siddiqa",
-      ],
-    },
-  },
-
   /** One entry per event — the site will show a card for each and RSVP is per-event. */
   events: [
     {

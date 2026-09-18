@@ -44,6 +44,12 @@ export function Closing() {
           </p>
         </Reveal>
 
+        <Reveal delay={0.18}>
+          <p className="mt-6 text-sm tracking-wide text-gold-light">
+            {eventConfig.giftNote}
+          </p>
+        </Reveal>
+
         <Reveal delay={0.25}>
           <h2 className="mt-10 font-display text-4xl text-gold-light sm:text-5xl">
             {eventConfig.couple.groomFirstName}
