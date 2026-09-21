@@ -48,8 +48,6 @@ export const eventConfig = {
     inviteLine: "We cordially invite you to the wedding of",
     subtitle:
       "With hearts full of joy, we begin this blessed journey together, Insha'Allah",
-    /** Compact date range shown in the hero — edit directly since it spans multiple events. */
-    dateLabel: "November 13 & 15, 2026",
   },
 
   /** One entry per event — the site will show a card for each and RSVP is per-event. */
@@ -80,10 +78,10 @@ export const eventConfig = {
     {
       slug: "nikkah",
       name: "Nikkah",
-      dateISO: "2026-11-13T15:30:00-06:00",
+      dateISO: "2026-11-13T15:00:00-06:00",
       dateLabel: "November 13th, 2026",
       dayOfWeek: "Friday",
-      timeLabel: "3:30 PM CST",
+      timeLabel: "3:00 PM CST",
       durationHours: 3,
       venueName: "Islamic Center of Naperville, Al Noor",
       address: "3540 248th Ave, Naperville, IL 60564",
@@ -116,8 +114,8 @@ export const eventConfig = {
   ] satisfies EventDetail[],
 
   dressCode: "Modest cultural attire or Islamic wear.",
-  rsvpDeadlineISO: "2026-10-31T23:59:59-05:00",
-  rsvpDeadlineLabel: "October 31st, 2026",
+  rsvpDeadlineISO: "2026-10-15T23:59:59-05:00",
+  rsvpDeadlineLabel: "October 15th, 2026",
   giftNote: "With love and gratitude, no boxed gifts please.",
 
   contact: {

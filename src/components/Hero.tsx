@@ -115,17 +115,6 @@ export function Hero() {
         >
           {eventConfig.hero.subtitle}
         </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="mt-10 flex items-center gap-4 font-display text-lg tracking-[0.2em] text-gold-light sm:text-xl"
-        >
-          <span className="h-px w-8 bg-gold-light/50" />
-          {eventConfig.hero.dateLabel}
-          <span className="h-px w-8 bg-gold-light/50" />
-        </motion.div>
       </motion.div>
 
       <motion.a

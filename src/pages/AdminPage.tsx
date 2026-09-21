@@ -168,8 +168,8 @@ function AdminDashboard() {
         ),
         pending: eventRows.filter((r) => r.rsvpStatus === "pending").length,
         declined: eventRows.filter((r) => r.rsvpStatus === "declined").length,
-        bySide: (["groom", "bride"] as const).map((side) => {
-          const sideRows = eventRows.filter((r) => r.side === side);
+        bySide: (["groom", "bride", "unset"] as const).map((side) => {
+          const sideRows = eventRows.filter((r) => (r.side ?? "unset") === side);
           return {
             side,
             seatsInvited: sideRows.reduce((sum, r) => sum + r.allowedGuestCount, 0),
@@ -248,11 +248,13 @@ function AdminDashboard() {
                 <StatTile label="Declined" value={declined} />
               </div>
               <div className="mt-3 flex flex-col gap-1 text-xs text-emerald-deep/60">
-                {eventBySide.map(({ side, seatsInvited: sideInvited, attending: sideAttending }) => (
-                  <p key={side}>
-                    {SIDE_LABELS[side]}: {sideInvited} invited · {sideAttending} attending
-                  </p>
-                ))}
+                {eventBySide
+                  .filter(({ side, seatsInvited: sideInvited }) => side !== "unset" || sideInvited > 0)
+                  .map(({ side, seatsInvited: sideInvited, attending: sideAttending }) => (
+                    <p key={side}>
+                      {SIDE_LABELS[side]}: {sideInvited} invited · {sideAttending} attending
+                    </p>
+                  ))}
               </div>
             </div>
           ))}
