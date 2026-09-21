@@ -168,6 +168,17 @@ function AdminDashboard() {
         ),
         pending: eventRows.filter((r) => r.rsvpStatus === "pending").length,
         declined: eventRows.filter((r) => r.rsvpStatus === "declined").length,
+        bySide: (["groom", "bride"] as const).map((side) => {
+          const sideRows = eventRows.filter((r) => r.side === side);
+          return {
+            side,
+            seatsInvited: sideRows.reduce((sum, r) => sum + r.allowedGuestCount, 0),
+            attending: sideRows.reduce(
+              (sum, r) => sum + (r.rsvpStatus === "attending" ? r.attendingCount : 0),
+              0,
+            ),
+          };
+        }),
       };
     });
   }, [rows]);
@@ -227,7 +238,7 @@ function AdminDashboard() {
           By Event
         </h2>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {byEvent.map(({ event, seatsInvited, attending, pending, declined }) => (
+          {byEvent.map(({ event, seatsInvited, attending, pending, declined, bySide: eventBySide }) => (
             <div key={event.slug} className="rounded-2xl border border-gold/25 bg-white/50 p-4">
               <p className="font-display text-lg text-emerald-deep">{event.name}</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -235,6 +246,13 @@ function AdminDashboard() {
                 <StatTile label="Attending" value={attending} />
                 <StatTile label="Pending" value={pending} />
                 <StatTile label="Declined" value={declined} />
+              </div>
+              <div className="mt-3 flex flex-col gap-1 text-xs text-emerald-deep/60">
+                {eventBySide.map(({ side, seatsInvited: sideInvited, attending: sideAttending }) => (
+                  <p key={side}>
+                    {SIDE_LABELS[side]}: {sideInvited} invited · {sideAttending} attending
+                  </p>
+                ))}
               </div>
             </div>
           ))}
